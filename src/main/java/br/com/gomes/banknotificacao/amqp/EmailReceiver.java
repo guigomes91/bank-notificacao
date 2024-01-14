@@ -21,11 +21,11 @@ public class EmailReceiver {
 	private EmailService emailService;
 
 	@RabbitListener(queues = "notifications")
-	public void receiveEmail(EmailClienteInput email) {
-		log.info("Received {} and send email client!", email.getEmail());
+	public void receiveEmail(EmailClienteInput emailClienteInput) {
+		log.info("Received {} and send email client!", emailClienteInput.getEmail());
 
 		try {
-			emailService.sendEmail(new ClienteDTO("", email.getEmail()));
+			emailService.sendEmail(new ClienteDTO(emailClienteInput.getNome(), emailClienteInput.getEmail()), emailClienteInput);
 		} catch (MessagingException | IOException | TemplateException e) {
 			e.printStackTrace();
 		}		

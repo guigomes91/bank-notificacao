@@ -9,5 +9,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class EmailClienteInput {
 
+	private String nome;
 	private String email;
+	private String assunto;
+	private String mensagem;
 }

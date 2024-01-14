@@ -11,6 +11,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
 import br.com.gomes.banknotificacao.dto.ClienteDTO;
+import br.com.gomes.banknotificacao.dto.EmailClienteInput;
 import freemarker.template.Configuration;
 import freemarker.template.TemplateException;
 import jakarta.mail.MessagingException;
@@ -25,23 +26,27 @@ public class EmailService {
 	@Autowired
 	private JavaMailSender javaMailSender;
 
-	public void sendEmail(ClienteDTO user) throws MessagingException, IOException, TemplateException {
+	public void sendEmail(ClienteDTO user, EmailClienteInput emailDTO) throws MessagingException, IOException, TemplateException {
 		MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 		MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
 		
-		helper.setSubject("Bem vindo ao Gomes Bank");
+		helper.setSubject(emailDTO.getAssunto());
 		helper.setTo(user.getEmail());
-		String emailContent = getEmailContent(user);
+		String emailContent = getEmailContent(user, emailDTO);
 		helper.setText(emailContent, true);
 		
 		javaMailSender.send(mimeMessage);
 	}
 
-	String getEmailContent(ClienteDTO user) throws IOException, TemplateException {
+	String getEmailContent(ClienteDTO user, EmailClienteInput emailDTO) throws IOException, TemplateException {
 		StringWriter stringWriter = new StringWriter();
 		Map<String, Object> model = new HashMap<>();
-		model.put("user", user);
+		model.put("user", user.getNome());
+		model.put("message", emailDTO.getMensagem());
+		model.put("subject", emailDTO.getAssunto());
+		
 		configuration.getTemplate("email.ftlh").process(model, stringWriter);
+		
 		return stringWriter.getBuffer().toString();
 	}
 }
